@@ -1,6 +1,10 @@
 # Z3 Minesweeper Solver
 
+> **⚠️ AI-Assisted Development**: This project was developed with AI assistance.
+
 A Minesweeper puzzle solver that uses the Z3 theorem prover to determine safe cells and mines with mathematical certainty. The application supports multiple game variants and provides an interactive GUI for puzzle input and solving.
+
+**🌐 Language**: [中文版](README-CN.md) | **English**
 
 ## Features
 
