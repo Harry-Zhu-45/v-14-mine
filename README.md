@@ -63,7 +63,7 @@ v-14-mine/
 The solver supports multiple neighbor calculation variants:
 
 - **Standard**: 8 neighbors (adjacent and diagonal cells)
-- **Knight**: Standard 8 + 8 knight moves (L-shaped)
+- **Knight**: 8 knight moves (L-shaped only)
 - **Manhattan**: Standard 8 + 4 orthogonal cells at distance 2
 - **OddEven**: The absolute value of the difference between the number of mines on odd and even colored cells (checkerboard coloring) among the 8 neighbors
 

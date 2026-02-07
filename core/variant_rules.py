@@ -66,7 +66,7 @@ class VariantRules:
         if variant_type == VARIANT_STANDARD:
             offsets = standard_offsets
         elif variant_type == VARIANT_KNIGHT:
-            offsets = standard_offsets + knight_offsets
+            offsets = knight_offsets
         elif variant_type == VARIANT_MANHATTAN:
             offsets = standard_offsets + [(-2, 0), (2, 0), (0, -2), (0, 2)]
         elif variant_type == VARIANT_ODD_EVEN:
