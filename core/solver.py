@@ -101,18 +101,17 @@ class MinesweeperSolver:
                         # OddEven variant: number = |odd_neighbors_mines - even_neighbors_mines|
                         weighted_terms = []
                         for nr, nc in nbs:
-                            # 这里的正负权重定义依然保留，但因为后面用了绝对值，方向反了也没关系
                             weight = 1 if self.is_odd_matrix[nr][nc] else -1
                             weighted_terms.append(z3_vars[nr][nc] * weight)
 
                         # 计算加权和 (即：奇数雷数 - 偶数雷数)
-                        weighted_sum = z3.Sum(weighted_terms)
-
-                        # === 修改开始 ===
                         # 绝对值约束：weighted_sum 等于 val 或者 -val
-                        # 这行代码替换了原来的: solver.add(z3.Sum(weighted_terms) == val)
+                        weighted_sum = z3.Sum(weighted_terms)
                         solver.add(z3.Or(weighted_sum == val, weighted_sum == -val))
-                        # === 修改结束 ===
+                    else:
+                        # Standard, Knight, Manhattan variants: number equals count of neighboring mines
+                        neighbor_mines = z3.Sum([z3_vars[nr][nc] for nr, nc in nbs])
+                        solver.add(neighbor_mines == val)
                 elif val == CELL_UNKNOWN_NUMBER:
                     # Cell is a number (0-8) but exact value unknown
                     solver.add(z3_vars[r][c] == 0)  # Not a mine
