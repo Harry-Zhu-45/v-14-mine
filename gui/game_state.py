@@ -39,7 +39,7 @@ class GameState:
         self.mine_highlights = set()
 
     def cycle_cell(self, row, col):
-        """Cycle a cell through possible values (unknown → 1 → 2 → ... → 8 → 0 → unknown).
+        """Cycle a cell through possible values (unknown → 0 → 1 → 2 → ... → 8 → unknown).
 
         Args:
             row: Row index of the cell
@@ -50,14 +50,12 @@ class GameState:
 
         if current == CELL_UNKNOWN:
             new_val = CELL_UNKNOWN_NUMBER
-        elif current == CELL_UNKNOWN_NUMBER:
-            new_val = 1
         elif current == CELL_FLAG:
-            new_val = 1
-        elif current == 8:
+            new_val = CELL_UNKNOWN_NUMBER
+        elif current == CELL_UNKNOWN_NUMBER:
             new_val = 0
-        elif current == 0:
-            new_val = CELL_UNKNOWN
+        elif current == 8:
+            new_val = CELL_UNKNOWN_NUMBER
         else:
             new_val = current + 1
 

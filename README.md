@@ -93,7 +93,7 @@ python main.py
 
 ### Controls
 
-- **Left Click**: Cycle cell through values (unknown → 1 → 2 → ... → 8 → 0 → unknown)
+- **Left Click**: Cycle cell through values (unknown → 0 → 1 → 2 → ... → 8 → unknown)
 - **Right Click**: Toggle flag on cell
 - **Ctrl+Z**: Undo last move
 - **Rule Button**: Dropdown to switch variants
