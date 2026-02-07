@@ -7,6 +7,7 @@ from .constants import (
     VARIANT_KNIGHT,
     VARIANT_MANHATTAN,
     VARIANT_ODD_EVEN,
+    VARIANT_CROSS,
 )
 
 
@@ -71,6 +72,17 @@ class VariantRules:
             offsets = standard_offsets + [(-2, 0), (2, 0), (0, -2), (0, 2)]
         elif variant_type == VARIANT_ODD_EVEN:
             offsets = standard_offsets
+        elif variant_type == VARIANT_CROSS:
+            offsets = [
+                (-2, 0),
+                (-1, 0),
+                (1, 0),
+                (2, 0),
+                (0, -2),
+                (0, -1),
+                (0, 1),
+                (0, 2),
+            ]
         else:
             offsets = standard_offsets
 
