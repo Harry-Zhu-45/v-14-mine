@@ -12,44 +12,27 @@ A Minesweeper puzzle solver that uses the Z3 theorem prover to determine safe ce
 - **Multiple Variants**: Supports Standard, Knight, and Manhattan neighbor rules
 - **Interactive GUI**: Pygame-based interface for easy puzzle input
 - **Undo Support**: Ctrl+Z to undo moves
-- **Configurable Grid**: Adjustable grid size (3x3 to 20x20) and mine count
+- **Configurable Grid**: Adjustable grid size (5x5 to 8x8) and mine count
 - **Visual Feedback**: Highlights safe cells (green) and mine cells (red)
 
 ## Architecture
 
 The project follows the **Model-View-Presenter (MVP)** architecture:
 
-```txt
-┌─────────────────────────────────────────────────────────────┐
-│                        GUI Layer (View)                     │
-│  pygame_gui.py - Pygame implementation                      │
-│  - Renders grid and UI controls                             │
-│  - Handles user input events                                │
-│  - Displays solver results                                  │
-└─────────────────────────────────────────────────────────────┘
-                              ↕
-┌─────────────────────────────────────────────────────────────┐
-│                     Presenter Layer                         │
-│  presenter.py - Mediator between model and view             │
-│  - Processes user interactions                              │
-│  - Coordinates solver calls                                 │
-│  - Updates view with results                                │
-└─────────────────────────────────────────────────────────────┘
-                              ↕
-┌─────────────────────────────────────────────────────────────┐
-│                      Model Layer                            │
-│  game_state.py - Manages game state                         │
-│  - Board state and cell values                              │
-│  - Move history for undo                                    │
-│  - Game configuration (size, mines, variant)                │
-└─────────────────────────────────────────────────────────────┘
-                              ↕
-┌─────────────────────────────────────────────────────────────┐
-│                     Core Logic                              │
-│  solver.py - Z3-based constraint solver                     │
-│  variant_rules.py - Neighbor calculation per variant        │
-│  constants.py - Shared constants                            │
-└─────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TB
+
+    View["GUI Layer (View)<br/>pygame_gui.py<br/><br/>Renders grid and UI controls<br/>Handles user input events<br/>Displays solver results"]
+
+    Presenter["Presenter Layer<br/>presenter.py<br/><br/>Processes user interactions<br/>Coordinates solver calls<br/>Updates view with results"]
+
+    Model["Model Layer<br/>game_state.py<br/><br/>Board state and cell values<br/>Move history for undo<br/>Game configuration (size, mines, variant)"]
+
+    Core["Core Logic<br/><br/>solver.py (Z3 constraint solver)<br/>variant_rules.py (Neighbor calculation logic)<br/>constants.py (Shared constants)"]
+
+    View --> Presenter
+    Presenter --> Model
+    Presenter --> Core
 ```
 
 ## Project Structure
@@ -72,11 +55,12 @@ v-14-mine/
 
 ## Game Variants
 
-The solver supports three neighbor calculation variants:
+The solver supports four neighbor calculation variants:
 
 1. **Standard**: 8 neighbors (adjacent and diagonal cells)
 2. **Knight**: Standard 8 + 8 knight moves (L-shaped)
 3. **Manhattan**: Standard 8 + 4 orthogonal cells at distance 2
+4. **OddEven**: The absolute value of the difference between the number of mines on odd and even colored cells (checkerboard coloring) among the 8 neighbors
 
 ## Installation
 
@@ -89,7 +73,7 @@ The solver supports three neighbor calculation variants:
 ### Install Dependencies
 
 ```bash
-pip install pygame z3-solver
+pip install -r requirements.txt
 ```
 
 ## Usage
