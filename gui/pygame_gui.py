@@ -98,32 +98,64 @@ class MinesweeperPygame:
         # self.screen = pygame.display.set_mode(self.window_size, pygame.RESIZABLE)
 
     def _min_window_size(self):
-        if not self.presenter:
-            width = self.padding * 2 + DEFAULT_COLS * self.cell_size
-            height = (
-                self.top_bar_height + self.padding * 2 + DEFAULT_ROWS * self.cell_size
-            )
-            return width, height
-
-        cols = self.presenter.get_cols()
-        rows = self.presenter.get_rows()
-        width = self.padding * 2 + cols * self.cell_size
-        height = self.top_bar_height + self.padding * 2 + rows * self.cell_size
-        return width, height
+        # 返回固定的最小窗口尺寸
+        return 750, 700
 
     def _content_offsets(self):
         window_width, window_height = self.screen.get_size()
-        min_width, min_height = self._min_window_size()
-        offset_x = max(0, (window_width - min_width) // 2)
-        offset_y = max(0, (window_height - min_height) // 2)
+        offset_x = max(0, (window_width - self._min_window_size()[0]) // 2)
+        offset_y = max(0, (window_height - self._min_window_size()[1]) // 2)
         return offset_x, offset_y
 
+    def _calculate_cell_size(self):
+        """根据窗口大小动态计算格子大小"""
+        if not self.presenter:
+            return self.cell_size
+
+        window_width, window_height = self.screen.get_size()
+        cols = self.presenter.get_cols()
+        rows = self.presenter.get_rows()
+
+        # 计算可用空间（减去padding和top bar）
+        available_width = window_width - 2 * self.padding
+        available_height = window_height - self.top_bar_height - 2 * self.padding
+
+        # 计算每个维度的格子大小
+        cell_width = available_width / cols
+        cell_height = available_height / rows
+
+        # 取较小值以保持格子正方形
+        cell_size = min(cell_width, cell_height)
+
+        # 限制格子大小范围，避免太大或太小
+        return max(20, min(80, int(cell_size)))
+
     def _grid_origin(self):
-        offset_x, offset_y = self._content_offsets()
-        return (
-            offset_x + self.padding,
-            offset_y + self.top_bar_height + self.padding,
-        )
+        window_width, window_height = self.screen.get_size()
+
+        if not self.presenter:
+            return (
+                self.padding,
+                self.top_bar_height + self.padding,
+            )
+
+        cols = self.presenter.get_cols()
+        rows = self.presenter.get_rows()
+        cell_size = self._calculate_cell_size()
+
+        # 计算网格总大小
+        grid_width = cols * cell_size
+        grid_height = rows * cell_size
+
+        # 计算可用区域（除去 UI 顶部区域）
+        available_width = window_width
+        available_height = window_height - self.top_bar_height
+
+        # 计算网格在可用区域中的居中位置
+        grid_x = (available_width - grid_width) // 2
+        grid_y = self.top_bar_height + (available_height - grid_height) // 2
+
+        return (grid_x, grid_y)
 
     def show_status(self, text):
         """Display a status message.
@@ -306,17 +338,15 @@ class MinesweeperPygame:
 
         window_width, _ = self.screen.get_size()
 
-        # Move to second row for Reset and Solve buttons (left aligned)
-        y = self.padding + 34
-        x = self.padding
-
-        reset_rect = pygame.Rect(x, y - 2, 90, 28)
-        x = reset_rect.right + spacing
-        solve_rect = pygame.Rect(x, y - 2, 100, 28)
-
+        # Reset and Solve buttons on first row (right aligned)
+        reset_rect = pygame.Rect(window_width - self.padding - 90, y - 2, 90, 28)
         self._draw_button(reset_rect, "Reset")
-        self._draw_button(solve_rect, "Solve")
         rects["reset"] = reset_rect
+
+        solve_rect = pygame.Rect(
+            window_width - self.padding - 90 - spacing - 90, y - 2, 90, 28
+        )
+        self._draw_button(solve_rect, "Solve")
         rects["solve"] = solve_rect
 
         status_y = y + 34
@@ -335,12 +365,13 @@ class MinesweeperPygame:
         board_state = self.presenter.get_board_state()
         rows = self.presenter.get_rows()
         cols = self.presenter.get_cols()
+        cell_size = self._calculate_cell_size()
 
         for r in range(rows):
             for c in range(cols):
-                x = origin_x + c * self.cell_size
-                y = origin_y + r * self.cell_size
-                rect = pygame.Rect(x, y, self.cell_size, self.cell_size)
+                x = origin_x + c * cell_size
+                y = origin_y + r * cell_size
+                rect = pygame.Rect(x, y, cell_size, cell_size)
 
                 val = board_state[r][c]
                 if self.presenter.is_cell_safe_highlight(r, c) and (
@@ -372,7 +403,10 @@ class MinesweeperPygame:
                     color = NUMBER_COLORS.get(val, (0, 0, 0))
 
                 if text:
-                    label = self.cell_font.render(text, True, color)
+                    # 根据格子大小动态调整字体大小
+                    font_size = max(10, int(cell_size * 0.6))
+                    font = pygame.font.Font(None, font_size)
+                    label = font.render(text, True, color)
                     label_rect = label.get_rect(center=rect.center)
                     self.screen.blit(label, label_rect)
 
@@ -391,8 +425,9 @@ class MinesweeperPygame:
         if x < origin_x or y < origin_y:
             return
 
-        col = (x - origin_x) // self.cell_size
-        row = (y - origin_y) // self.cell_size
+        cell_size = self._calculate_cell_size()
+        col = (x - origin_x) // cell_size
+        row = (y - origin_y) // cell_size
 
         if not (
             0 <= row < self.presenter.get_rows()
@@ -409,8 +444,9 @@ class MinesweeperPygame:
             self.clock.tick(60)
             self.screen.fill(COLOR_BACKGROUND)
 
-            ui_rects = self._layout_ui()
+            # draw grid, and then draw UI on top
             self._draw_grid()
+            ui_rects = self._layout_ui()
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
