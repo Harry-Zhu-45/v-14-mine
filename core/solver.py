@@ -4,7 +4,13 @@ from typing import List, Tuple, Optional
 
 import z3
 
-from .constants import CELL_UNKNOWN, CELL_FLAG, CELL_UNKNOWN_NUMBER, VARIANT_ODD_EVEN
+from .constants import (
+    CELL_UNKNOWN,
+    CELL_FLAG,
+    CELL_UNKNOWN_NUMBER,
+    VARIANT_ODD_EVEN,
+    VARIANT_PARTITION,
+)
 from .variant_rules import VariantRules
 
 
@@ -108,6 +114,58 @@ class MinesweeperSolver:
                         # 绝对值约束：weighted_sum 等于 val 或者 -val
                         weighted_sum = z3.Sum(weighted_terms)
                         solver.add(z3.Or(weighted_sum == val, weighted_sum == -val))
+                    elif self.variant == VARIANT_PARTITION:
+                        # 1. 定义顺时针方向的8个偏移量 (从左上角开始顺时针)
+                        clockwise_offsets = [
+                            (-1, -1),
+                            (-1, 0),
+                            (-1, 1),  # Top-Left, Top, Top-Right
+                            (0, 1),  # Right
+                            (1, 1),
+                            (1, 0),
+                            (1, -1),  # Bottom-Right, Bottom, Bottom-Left
+                            (0, -1),  # Left
+                        ]
+
+                        # 2. 获取按顺时针排列的邻居变量列表
+                        ring_vars = []
+                        for dr, dc in clockwise_offsets:
+                            nr, nc = r + dr, c + dc
+                            # 边界检查：如果在网格内，取对应的Z3变量；如果在网格外，视为0 (非雷)
+                            if 0 <= nr < self.rows and 0 <= nc < self.cols:
+                                ring_vars.append(z3_vars[nr][nc])
+                            else:
+                                ring_vars.append(0)  # 边界外视为安全，切断连通性
+
+                        # 3. 统计 0 -> 1 的跳变次数 (一个新的雷组开始)
+                        transitions = []
+                        for i in range(8):
+                            curr_v = ring_vars[i]
+                            prev_v = ring_vars[(i - 1) % 8]  # 环状取前一个
+
+                            # 如果 (前一个==0 且 当前==1)，则计数+1
+                            # 使用 z3.If 将布尔结果转换为整数 1 或 0
+                            transitions.append(
+                                z3.If(z3.And(prev_v == 0, curr_v == 1), 1, 0)
+                            )
+
+                        group_count = z3.Sum(transitions)
+
+                        # 4. 特殊情况：如果8格全是雷，跳变次数为0，但应算作1组
+                        # 检查是否所有变量都为1
+                        # 注意：如果边界外有0，这里永远为False，逻辑依然正确
+                        is_full_ring = z3.And(
+                            [v == 1 for v in ring_vars if isinstance(v, z3.ArithRef)]
+                        )
+                        # (注：边界外的 0 是 int 类型，isinstance 用于过滤或直接比较即可，上面写法简化版如下)
+
+                        # 更严谨的 Z3 写法：
+                        is_full_ring = z3.And([v == 1 for v in ring_vars])
+
+                        # 最终约束：如果是全环，值为1；否则为跳变次数
+                        final_count = z3.If(is_full_ring, 1, group_count)
+
+                        solver.add(final_count == val)
                     else:
                         # Standard, Knight, Manhattan variants: number equals count of neighboring mines
                         neighbor_mines = z3.Sum([z3_vars[nr][nc] for nr, nc in nbs])
@@ -129,6 +187,40 @@ class MinesweeperSolver:
                         weighted_sum = z3.Sum(weighted_terms)
                         solver.add(weighted_sum >= -8)
                         solver.add(weighted_sum <= 8)
+                    elif self.variant == VARIANT_PARTITION:
+                        clockwise_offsets = [
+                            (-1, -1),
+                            (-1, 0),
+                            (-1, 1),
+                            (0, 1),
+                            (1, 1),
+                            (1, 0),
+                            (1, -1),
+                            (0, -1),
+                        ]
+                        ring_vars = []
+                        for dr, dc in clockwise_offsets:
+                            nr, nc = r + dr, c + dc
+                            if 0 <= nr < self.rows and 0 <= nc < self.cols:
+                                ring_vars.append(z3_vars[nr][nc])
+                            else:
+                                ring_vars.append(0)
+
+                        transitions = []
+                        for i in range(8):
+                            curr_v = ring_vars[i]
+                            prev_v = ring_vars[(i - 1) % 8]
+                            transitions.append(
+                                z3.If(z3.And(prev_v == 0, curr_v == 1), 1, 0)
+                            )
+
+                        group_count = z3.Sum(transitions)
+                        is_full_ring = z3.And([v == 1 for v in ring_vars])
+                        final_count = z3.If(is_full_ring, 1, group_count)
+
+                        # 约束：对于未知数字，只要满足基本的 Partition 规则即可 (0到4组是物理极限，但约束0-8也行)
+                        solver.add(final_count >= 0)
+                        solver.add(final_count <= 8)
                     else:
                         # Standard variants: number of neighboring mines is between 0 and 8
                         neighbor_mines = z3.Sum([z3_vars[nr][nc] for nr, nc in nbs])

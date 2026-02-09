@@ -8,6 +8,7 @@ from .constants import (
     VARIANT_MANHATTAN,
     VARIANT_ODD_EVEN,
     VARIANT_CROSS,
+    VARIANT_PARTITION,
 )
 
 
@@ -83,6 +84,8 @@ class VariantRules:
                 (0, 1),
                 (0, 2),
             ]
+        elif variant_type == VARIANT_PARTITION:
+            offsets = standard_offsets
         else:
             offsets = standard_offsets
 
