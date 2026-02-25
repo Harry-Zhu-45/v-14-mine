@@ -1,9 +1,9 @@
 """Presenter layer for Minesweeper solver MVP architecture."""
 
-from core.constants import VARIANT_TYPES
+# from core.constants import VARIANT_TYPES
 from core.solver import MinesweeperSolver
-from core.variant_rules import VariantRules
-from gui.game_state import GameState
+# from core.variant_rules import VariantRules
+# from models.game_state import GameState
 
 
 class MinesweeperPresenter:

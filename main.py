@@ -1,8 +1,8 @@
 """Main entry point for the Minesweeper solver application."""
 
 from gui.pygame_gui import MinesweeperPygame
-from gui.game_state import GameState
 from gui.presenter import MinesweeperPresenter
+from models.game_state import GameState
 
 if __name__ == "__main__":
     # Create MVP components

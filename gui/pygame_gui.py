@@ -18,8 +18,8 @@ from core.constants import (
     VARIANT_TYPES,
 )
 from gui.constants import *
-from gui.game_state import GameState
-from gui.presenter import MinesweeperPresenter
+# from models.game_state import GameState
+# from gui.presenter import MinesweeperPresenter
 
 
 class MinesweeperPygame:
