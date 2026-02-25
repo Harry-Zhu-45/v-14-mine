@@ -1,9 +1,6 @@
 """Presenter layer for Minesweeper solver MVP architecture."""
 
-# from core.constants import VARIANT_TYPES
 from core.solver import MinesweeperSolver
-# from core.variant_rules import VariantRules
-# from models.game_state import GameState
 
 
 class MinesweeperPresenter:
@@ -70,10 +67,31 @@ class MinesweeperPresenter:
             self.view.update_display()
 
     def on_variant_change(self):
-        """Handle variant change button click."""
-        new_variant = self.game_state.change_variant()
-        self.view.show_status(f"Variant: {new_variant}")
-        self.view.update_display()
+        """Handle variant change button click (cycles to next variant)."""
+        from core.constants import VARIANT_TYPES
+
+        idx = (
+            VARIANT_TYPES.index(self.game_state.variant)
+            if self.game_state.variant in VARIANT_TYPES
+            else 0
+        )
+        new_variant = VARIANT_TYPES[(idx + 1) % len(VARIANT_TYPES)]
+
+        if self.game_state.set_variant(new_variant):
+            self.game_state.reset(preserve_board=True)
+            self.view.show_status(f"Variant: {new_variant}")
+            self.view.update_display()
+
+    def on_variant_set(self, variant):
+        """Handle variant selection from dropdown.
+
+        Args:
+            variant: Variant name to set
+        """
+        if self.game_state.set_variant(variant):
+            self.game_state.reset(preserve_board=True)
+            self.view.show_status(f"Variant: {variant}")
+            self.view.update_display()
 
     def on_size_change(self, delta):
         """Handle size change button click.

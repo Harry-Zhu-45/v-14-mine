@@ -1,5 +1,5 @@
 """GUI module for Minesweeper solver."""
 
-from .pygame_gui import MinesweeperPygame
+from .pyqt_gui import MinesweeperPyQt
 
-__all__ = ["MinesweeperPygame"]
+__all__ = ["MinesweeperPyQt"]

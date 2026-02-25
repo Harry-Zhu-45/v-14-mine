@@ -14,8 +14,7 @@ VARIANT_CROSS = "Cross"
 VARIANT_PARTITION = "Partition"
 
 # Default configuration
-DEFAULT_ROWS = 10
-DEFAULT_COLS = 10
+DEFAULT_SIZE = 5
 DEFAULT_MINES = 10
 
 # All variant types

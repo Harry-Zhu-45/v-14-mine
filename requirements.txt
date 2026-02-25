@@ -1,2 +1,2 @@
-pygame
+PyQt6
 z3-solver

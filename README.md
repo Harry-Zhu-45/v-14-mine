@@ -14,9 +14,9 @@ A Minesweeper puzzle solver that uses the Z3 theorem prover to determine safe ce
 
 - **Exact Solver**: Uses Z3 constraint solving to find logically certain moves
 - **Multiple Variants**: Supports Standard, Knight, Manhattan, and OddEven neighbor rules
-- **Interactive GUI**: Pygame-based interface for easy puzzle input
+- **Interactive GUI**: PyQt-based interface for easy puzzle input
 - **Undo Support**: Ctrl+Z to undo moves
-- **Configurable Grid**: Adjustable grid size (5x5 to 8x8) and mine count
+- **Configurable Grid**: Adjustable grid size (5, 6, 7, 8) and mine count
 - **Visual Feedback**: Highlights safe cells (green) and mine cells (red)
 - **Question Mark Support**: Mark cells with "?" to indicate unknown numbers (not mines)
 
@@ -27,7 +27,7 @@ The project follows the **Model-View-Presenter (MVP)** architecture:
 ```mermaid
 flowchart TB
 
-    View["GUI Layer (View)<br/>pygame_gui.py<br/><br/>Renders grid and UI controls<br/>Handles user input events<br/>Displays solver results"]
+    View["GUI Layer (View)<br/>pyqt_gui.py<br/><br/>Renders grid and UI controls<br/>Handles user input events<br/>Displays solver results"]
 
     Presenter["Presenter Layer<br/>presenter.py<br/><br/>Processes user interactions<br/>Coordinates solver calls<br/>Updates view with results"]
 
@@ -50,11 +50,13 @@ v-14-mine/
 │   ├── solver.py        # Z3 constraint solver
 │   ├── variant_rules.py # Neighbor calculation logic
 │   └── constants.py     # Core constants (cell states, variants)
+├── models/
+│   ├── __init__.py
+│   └── game_state.py    # Game state model
 └── gui/
     ├── __init__.py
-    ├── pygame_gui.py    # Pygame view implementation
+    ├── pyqt_gui.py      # PyQt view implementation
     ├── presenter.py     # MVP presenter
-    ├── game_state.py    # Game state model
     └── constants.py     # GUI colors and styles
 ```
 
@@ -74,7 +76,7 @@ To be continued (maybe)
 ### Requirements
 
 - Python 3.12+
-- Pygame
+- PyQt6
 - Z3 Solver
 
 ### Install Dependencies
@@ -97,7 +99,7 @@ python main.py
 - **Right Click**: Toggle flag on cell
 - **Ctrl+Z**: Undo last move
 - **Rule Button**: Dropdown to switch variants
-- **Size**: Dropdown to select grid size (square grid)
+- **Size**: Dropdown to select grid size (5, 6, 7, 8)
 - **Mines**: Manual input or +/- to adjust total mine count
 - **Reset**: Clear the board
 - **Solve**: Run Z3 solver to find certain moves

@@ -113,7 +113,7 @@ class GameState:
         Returns:
             True if size changed, False otherwise
         """
-        new_size = max(3, min(20, self.rows + delta))
+        new_size = max(5, min(8, self.rows + delta))
         if new_size == self.rows:
             return False
 
@@ -140,17 +140,22 @@ class GameState:
         self.total_mines = new_mines
         return True
 
-    def change_variant(self):
-        """Cycle to next game variant.
+    def set_variant(self, variant):
+        """Set game variant.
+
+        Args:
+            variant: Variant name to set
 
         Returns:
-            The new variant name
+            True if variant changed, False otherwise
         """
         from core.constants import VARIANT_TYPES
 
-        idx = VARIANT_TYPES.index(self.variant) if self.variant in VARIANT_TYPES else 0
-        self.variant = VARIANT_TYPES[(idx + 1) % len(VARIANT_TYPES)]
-        return self.variant
+        if variant not in VARIANT_TYPES or variant == self.variant:
+            return False
+
+        self.variant = variant
+        return True
 
     def get_cell_value(self, row, col):
         """Get the value of a cell.
