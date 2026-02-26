@@ -212,3 +212,19 @@ class GameState:
         """
         self.safe_highlights = set(safe_cells)
         self.mine_highlights = set(mine_cells)
+
+    def set_board_from_capture(self, rows: int, cols: int, board_state: list):
+        """Set board state from screen capture.
+
+        Args:
+            rows: Number of rows
+            cols: Number of columns
+            board_state: 2D list of cell values
+        """
+        self.rows = rows
+        self.cols = cols
+        self.board_state = board_state
+        self.total_mines = min(self.total_mines, rows * cols)
+        self.history = []
+        self.safe_highlights = set()
+        self.mine_highlights = set()

@@ -111,13 +111,9 @@ class GridWidget(QWidget):
                 val = board_state[r][c]
 
                 # Determine background color
-                if self.presenter.is_cell_safe_highlight(r, c) and (
-                    val == CELL_UNKNOWN or val == CELL_UNKNOWN_NUMBER
-                ):
+                if self.presenter.is_cell_safe_highlight(r, c) and (val == CELL_UNKNOWN or val == CELL_UNKNOWN_NUMBER):
                     bg_color = QColor(*COLOR_SAFE_HIGHLIGHT)
-                elif self.presenter.is_cell_mine_highlight(r, c) and (
-                    val == CELL_UNKNOWN or val == CELL_UNKNOWN_NUMBER
-                ):
+                elif self.presenter.is_cell_mine_highlight(r, c) and (val == CELL_UNKNOWN or val == CELL_UNKNOWN_NUMBER):
                     bg_color = QColor(*COLOR_MINE_HIGHLIGHT)
                 elif val >= 0:
                     bg_color = QColor(*COLOR_REVEALED)
@@ -152,9 +148,7 @@ class GridWidget(QWidget):
                     font.setBold(True)
                     painter.setFont(font)
                     painter.setPen(color)
-                    painter.drawText(
-                        x, y, cell_size, cell_size, Qt.AlignmentFlag.AlignCenter, text
-                    )
+                    painter.drawText(x, y, cell_size, cell_size, Qt.AlignmentFlag.AlignCenter, text)
 
     def mousePressEvent(self, event):
         """Handle mouse click on grid."""
@@ -172,10 +166,7 @@ class GridWidget(QWidget):
         col = int((x - origin_x) // cell_size)
         row = int((y - origin_y) // cell_size)
 
-        if not (
-            0 <= row < self.presenter.get_rows()
-            and 0 <= col < self.presenter.get_cols()
-        ):
+        if not (0 <= row < self.presenter.get_rows() and 0 <= col < self.presenter.get_cols()):
             return
 
         button = event.button()
@@ -188,10 +179,7 @@ class GridWidget(QWidget):
 
     def keyPressEvent(self, event):
         """Handle keyboard shortcuts."""
-        if (
-            event.key() == Qt.Key.Key_Z
-            and event.modifiers() & Qt.KeyboardModifier.ControlModifier
-        ):
+        if event.key() == Qt.Key.Key_Z and event.modifiers() & Qt.KeyboardModifier.ControlModifier:
             if self.presenter:
                 self.presenter.on_undo_click()
                 self.update()
@@ -306,6 +294,15 @@ class MinesweeperPyQt(QMainWindow):
         self.reset_btn.setFixedWidth(100)
         top_layout.addWidget(self.reset_btn)
 
+        top_layout.addSpacing(10)
+
+        # Capture button
+        self.capture_btn = QPushButton("Capture")
+        self.capture_btn.setFont(large_font)
+        self.capture_btn.clicked.connect(self._on_capture_clicked)
+        self.capture_btn.setFixedWidth(120)
+        top_layout.addWidget(self.capture_btn)
+
         main_layout.addWidget(top_bar)
 
         # Status label
@@ -349,6 +346,83 @@ class MinesweeperPyQt(QMainWindow):
         if self.presenter:
             self.presenter.on_reset_click()
 
+    def _on_capture_clicked(self):
+        """Handle capture button click - open file dialog to import image."""
+        if not self.presenter:
+            return
+
+        from PyQt6.QtWidgets import QFileDialog
+
+        # Open file dialog to select an image
+        file_path, _ = QFileDialog.getOpenFileName(
+            self,
+            "Select Minesweeper Board Image",
+            "",
+            "Images (*.png *.jpg *.jpeg *.bmp *.gif);;All Files (*)",
+        )
+
+        if file_path:
+            self._process_imported_image(file_path)
+
+    def _process_imported_image(self, file_path: str):
+        """Process the imported image file.
+
+        Args:
+            file_path: Path to the imported image file
+        """
+        try:
+            import cv2
+            from classify.board_detector import BoardDetector
+            from classify.classifier import CellClassifier
+
+            print(f"[Import] Loading image: {file_path}")
+            # Load image using OpenCV
+            image = cv2.imread(file_path)
+
+            if image is None:
+                print("[Import] Failed to load image")
+                self.show_status("Failed to load image")
+                return
+
+            print(f"[Import] Image loaded: {image.shape[1]}x{image.shape[0]} pixels")
+
+            # Detect board grid
+            print("[Import] Detecting board grid...")
+            detector = BoardDetector(image)
+            rows, cols = detector.detect_grid()
+
+            if rows == 0 or cols == 0:
+                print("[Import] Failed to detect board grid")
+                self.show_status("Failed to detect board grid")
+                return
+
+            print(f"[Import] Grid detected: {rows} rows x {cols} cols")
+            print(f"[Import] Cell size: {detector.cell_width}x{detector.cell_height}")
+
+            # Get cell images and classify
+            print("[Import] Extracting cell images...")
+            cell_images = detector.get_cell_images()
+            print("[Import] Classifying cells...")
+            classifier = CellClassifier()
+            board_state = classifier.classify_board(cell_images, debug=True)
+
+            # Debug: print classification results
+            print("[Import] Classification results:")
+            for r, row in enumerate(board_state):
+                row_str = " ".join(f"{v:2}" for v in row)
+                print(f"  Row {r}: [{row_str}]")
+
+            # Update game state through presenter
+            print("[Import] Updating game state...")
+            self.presenter.on_board_captured(rows, cols, board_state)
+
+            print("[Import] Done!")
+            self.show_status(f"Detected {rows}x{cols} board")
+
+        except Exception as e:
+            print(f"[Import] Error: {str(e)}")
+            self.show_status(f"Import error: {str(e)}")
+
     def show_status(self, text):
         """Display a status message.
 
@@ -378,9 +452,7 @@ class MinesweeperPyQt(QMainWindow):
             self.size_combo.blockSignals(False)
 
             self.mines_spin.blockSignals(True)
-            self.mines_spin.setMaximum(
-                self.presenter.get_rows() * self.presenter.get_cols()
-            )
+            self.mines_spin.setMaximum(self.presenter.get_rows() * self.presenter.get_cols())
             self.mines_spin.setValue(self.presenter.get_total_mines())
             self.mines_spin.blockSignals(False)
 

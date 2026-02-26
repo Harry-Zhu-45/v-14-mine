@@ -70,11 +70,7 @@ class MinesweeperPresenter:
         """Handle variant change button click (cycles to next variant)."""
         from core.constants import VARIANT_TYPES
 
-        idx = (
-            VARIANT_TYPES.index(self.game_state.variant)
-            if self.game_state.variant in VARIANT_TYPES
-            else 0
-        )
+        idx = VARIANT_TYPES.index(self.game_state.variant) if self.game_state.variant in VARIANT_TYPES else 0
         new_variant = VARIANT_TYPES[(idx + 1) % len(VARIANT_TYPES)]
 
         if self.game_state.set_variant(new_variant):
@@ -111,6 +107,18 @@ class MinesweeperPresenter:
         """
         if self.game_state.change_mine_count(delta):
             self.view.update_display()
+
+    def on_board_captured(self, rows: int, cols: int, board_state: list):
+        """Handle board capture from screen.
+
+        Args:
+            rows: Number of rows detected
+            cols: Number of columns detected
+            board_state: 2D list of cell values from classifier
+        """
+        self.game_state.set_board_from_capture(rows, cols, board_state)
+        self.view.on_grid_size_changed()
+        self.view.update_display()
 
     def get_game_state(self):
         """Get the current game state.
