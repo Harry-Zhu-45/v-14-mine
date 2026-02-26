@@ -74,13 +74,20 @@ v-14-mine/
 
 ### 要求
 
+- Python 3.9+
 - PyQt6
 - Z3 Solver
 
 ### 安装依赖
 
+本项目使用 [uv](https://docs.astral.sh/uv/) 进行依赖管理。
+
 ```bash
-pip install -r requirements.txt
+# 安装 uv（如果尚未安装）
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# 创建虚拟环境并安装依赖
+uv sync
 ```
 
 ## 使用方法

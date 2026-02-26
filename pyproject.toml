@@ -1,0 +1,18 @@
+[project]
+name = "v-14-mine"
+version = "0.2.0"
+description = "v-14-mine helper"
+
+readme = "README.md"
+
+requires-python = ">=3.9"
+
+dependencies = [
+    "numpy>=2.0.2",
+    "opencv-python>=4.13.0.92",
+    "pillow>=11.3.0",
+    "pyautogui>=0.9.54",
+    "pyqt6>=6.10.2",
+    "pytesseract>=0.3.13",
+    "z3-solver>=4.16.0.0",
+]

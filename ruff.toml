@@ -1,0 +1,53 @@
+include = ["*.py", "*.ipynb"] # 检查所有 Python 文件和 Jupyter Notebook 文件
+
+extend-exclude = [ # 排除以下路径和文件
+    ".git",        # Git 仓库目录
+    "__pycache__", # Python 缓存目录
+    "build",       # 构建目录
+]
+
+line-length = 200 # 每行最大字符数
+indent-width = 4  # 缩进使用 4 个空格
+
+[lint]
+select = [ # 启用的规则类别
+    "E",   # PEP8 基础错误（如缩进、空格）
+    "F",   # Pyflakes 静态检查（如未使用变量）
+    "N",   # PEP8 命名规范（如变量名格式）
+    "W",   # PEP8 警告（如代码风格建议）
+    "D",   # pydocstyle 文档字符串规范
+    "NPY", # NumPy 特定规则
+    "RUF", # Ruff 特有规则
+]
+
+ignore = [ # 忽略的具体规则
+    "D105",   # 忽略魔术方法不写文档
+    "D107",   # 忽略 __init__ 不写文档
+    "D205",   # 忽略文档字符串中摘要与具体内容之间没有空行分割
+    "D214",   # 忽略文档字符串的过渡缩进
+    "D301",   # 忽略文档字符串中使用反斜杠
+    "D415",   # 忽略文档字符串不用标点符号结尾
+    "N803",   # 忽略不满足snake_case的变量名
+    "N806",   # 忽略大写变量名
+    "N816",   # 忽略不满足snake_case的全局变量名
+    "RUF002", # 忽略文档字符串中看起来很像Unicode字符的字符，例如允许使用中文逗号
+    "RUF003", # 忽略注释中看起来很像Unicode字符的字符，例如允许使用中文逗号
+]
+
+
+[lint.pydocstyle]
+convention = "google" # 强制使用 Google 风格的文档字符串格式
+
+
+[lint.per-file-ignores]
+# 测试文件无需完整文档
+"**/pytest/*" = ["D", "F811", "N999"] # 忽略文档、未定义名称、占位符检查
+# 文档示例文件无需严格格式
+"sphinx-doc/howto/*.py" = ["D"]
+
+
+[format]
+indent-style = "space"          # 缩进用空格（非 Tab）
+line-ending = "auto"            # 自动检测换行符（LF/CRLF）
+docstring-code-line-length = 72 # 文档字符串中的代码行长度限制
+docstring-code-format = true    # 启用文档字符串内的代码格式化

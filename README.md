@@ -75,14 +75,20 @@ To be continued (maybe)
 
 ### Requirements
 
-- Python 3.12+
+- Python 3.9+
 - PyQt6
 - Z3 Solver
 
 ### Install Dependencies
 
+This project uses [uv](https://docs.astral.sh/uv/) for dependency management.
+
 ```bash
-pip install -r requirements.txt
+# Install uv (if not already installed)
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Create virtual environment and install dependencies
+uv sync
 ```
 
 ## Usage
