@@ -3,7 +3,7 @@
 # Cell state constants
 CELL_UNKNOWN = -1
 CELL_FLAG = -2
-CELL_UNKNOWN_NUMBER = -3  # Cell is a number (0-8) but exact value unknown
+CELL_UNKNOWN_NUMBER = -3  # Cell is a number but exact value unknown
 
 # Variant type constants
 VARIANT_STANDARD = "Standard"
