@@ -14,5 +14,8 @@ dependencies = [
     "pyautogui>=0.9.54",
     "pyqt6>=6.10.2",
     "pytesseract>=0.3.13",
+    "scipy>=1.13.1",
+    "torch>=2.8.0",
+    "torchvision>=0.23.0",
     "z3-solver>=4.16.0.0",
 ]
