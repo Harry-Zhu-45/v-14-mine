@@ -12,7 +12,7 @@ class GameState:
         Args:
             rows: Number of rows in the grid
             cols: Number of columns in the grid
-            variant: Game variant ("Standard", "Knight", or "Manhattan")
+            variant: Game variant ("Standard", "Knight", "OddEven", "Cross", or "Partition")
             total_mines: Total number of mines in the grid
         """
         self.rows = rows

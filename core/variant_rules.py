@@ -5,7 +5,6 @@ from typing import List, Tuple
 from .constants import (
     VARIANT_STANDARD,
     VARIANT_KNIGHT,
-    VARIANT_MANHATTAN,
     VARIANT_ODD_EVEN,
     VARIANT_CROSS,
     VARIANT_PARTITION,
@@ -29,9 +28,7 @@ class VariantRules:
         return (r + c) % 2 == 1
 
     @staticmethod
-    def get_neighbors(
-        r: int, c: int, rows: int, cols: int, variant_type: str = VARIANT_STANDARD
-    ) -> List[Tuple[int, int]]:
+    def get_neighbors(r: int, c: int, rows: int, cols: int, variant_type: str = VARIANT_STANDARD) -> List[Tuple[int, int]]:
         """Get neighbors of a cell based on the variant type.
 
         Args:
@@ -39,7 +36,7 @@ class VariantRules:
             c: Column index
             rows: Total rows in the grid
             cols: Total columns in the grid
-            variant_type: Type of variant ("Standard", "Knight", "Manhattan", or "OddEven")
+            variant_type: Type of variant ("Standard", "Knight", "OddEven", "Cross", or "Partition")
 
         Returns:
             List of (row, col) tuples for valid neighbors
@@ -69,8 +66,6 @@ class VariantRules:
             offsets = standard_offsets
         elif variant_type == VARIANT_KNIGHT:
             offsets = knight_offsets
-        elif variant_type == VARIANT_MANHATTAN:
-            offsets = standard_offsets + [(-2, 0), (2, 0), (0, -2), (0, 2)]
         elif variant_type == VARIANT_ODD_EVEN:
             offsets = standard_offsets
         elif variant_type == VARIANT_CROSS:

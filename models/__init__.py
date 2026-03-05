@@ -1,4 +1,4 @@
-# Models module for Minesweeper solver.
+"""Models module for Minesweeper solver."""
 
 from .game_state import GameState
 

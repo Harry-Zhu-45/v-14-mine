@@ -31,7 +31,7 @@ class MinesweeperSolver:
             rows: Number of rows in the grid
             cols: Number of columns in the grid
             board_state: 2D list of cell values (-2=flag, -1=unknown, 0-8=revealed count)
-            variant_type: Type of variant ("Standard", "Knight", "Manhattan", or "OddEven")
+            variant_type: Type of variant ("Standard", "Knight", "OddEven", "Cross", or "Partition")
             total_mines: Optional total number of mines in the grid
         """
         self.rows = rows
@@ -61,16 +61,11 @@ class MinesweeperSolver:
         self.neighbor_cache = {}
         for r in range(self.rows):
             for c in range(self.cols):
-                self.neighbor_cache[(r, c)] = VariantRules.get_neighbors(
-                    r, c, self.rows, self.cols, self.variant
-                )
+                self.neighbor_cache[(r, c)] = VariantRules.get_neighbors(r, c, self.rows, self.cols, self.variant)
 
     def _precompute_parity(self):
         """Precompute odd/even parity matrix for OddEven variant."""
-        self.is_odd_matrix = [
-            [VariantRules.is_odd_cell(r, c) for c in range(self.cols)]
-            for r in range(self.rows)
-        ]
+        self.is_odd_matrix = [[VariantRules.is_odd_cell(r, c) for c in range(self.cols)] for r in range(self.rows)]
 
     def solve(self) -> Tuple[List[Tuple[int, int]], List[Tuple[int, int]]]:
         """Solve the current board state.
@@ -82,9 +77,7 @@ class MinesweeperSolver:
             ValueError: If no solution exists for the current constraints
         """
         # Create Z3 variables for each cell (0=empty, 1=mine)
-        z3_vars = [
-            [z3.Int(f"c_{r}_{c}") for c in range(self.cols)] for r in range(self.rows)
-        ]
+        z3_vars = [[z3.Int(f"c_{r}_{c}") for c in range(self.cols)] for r in range(self.rows)]
         solver = z3.Solver()
 
         # Constraint: each cell is either 0 (empty) or 1 (mine)
@@ -145,18 +138,14 @@ class MinesweeperSolver:
 
                             # 如果 (前一个==0 且 当前==1)，则计数+1
                             # 使用 z3.If 将布尔结果转换为整数 1 或 0
-                            transitions.append(
-                                z3.If(z3.And(prev_v == 0, curr_v == 1), 1, 0)
-                            )
+                            transitions.append(z3.If(z3.And(prev_v == 0, curr_v == 1), 1, 0))
 
                         group_count = z3.Sum(transitions)
 
                         # 4. 特殊情况：如果8格全是雷，跳变次数为0，但应算作1组
                         # 检查是否所有变量都为1
                         # 注意：如果边界外有0，这里永远为False，逻辑依然正确
-                        is_full_ring = z3.And(
-                            [v == 1 for v in ring_vars if isinstance(v, z3.ArithRef)]
-                        )
+                        is_full_ring = z3.And([v == 1 for v in ring_vars if isinstance(v, z3.ArithRef)])
                         # (注：边界外的 0 是 int 类型，isinstance 用于过滤或直接比较即可，上面写法简化版如下)
 
                         # 更严谨的 Z3 写法：
@@ -167,7 +156,7 @@ class MinesweeperSolver:
 
                         solver.add(final_count == val)
                     else:
-                        # Standard, Knight, Manhattan variants: number equals count of neighboring mines
+                        # Standard, Knight, OddEven variants: number equals count of neighboring mines
                         neighbor_mines = z3.Sum([z3_vars[nr][nc] for nr, nc in nbs])
                         solver.add(neighbor_mines == val)
                 elif val == CELL_UNKNOWN_NUMBER:
@@ -210,9 +199,7 @@ class MinesweeperSolver:
                         for i in range(8):
                             curr_v = ring_vars[i]
                             prev_v = ring_vars[(i - 1) % 8]
-                            transitions.append(
-                                z3.If(z3.And(prev_v == 0, curr_v == 1), 1, 0)
-                            )
+                            transitions.append(z3.If(z3.And(prev_v == 0, curr_v == 1), 1, 0))
 
                         group_count = z3.Sum(transitions)
                         is_full_ring = z3.And([v == 1 for v in ring_vars])
@@ -233,12 +220,7 @@ class MinesweeperSolver:
 
         # Optional: total mines constraint
         if self.total_mines is not None:
-            solver.add(
-                z3.Sum(
-                    [z3_vars[r][c] for r in range(self.rows) for c in range(self.cols)]
-                )
-                == self.total_mines
-            )
+            solver.add(z3.Sum([z3_vars[r][c] for r in range(self.rows) for c in range(self.cols)]) == self.total_mines)
 
         if not unknown_cells:
             return [], []
