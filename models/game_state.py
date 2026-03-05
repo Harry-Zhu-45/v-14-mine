@@ -157,28 +157,6 @@ class GameState:
         self.variant = variant
         return True
 
-    def get_cell_value(self, row, col):
-        """Get the value of a cell.
-
-        Args:
-            row: Row index
-            col: Column index
-
-        Returns:
-            Cell value (CELL_UNKNOWN, CELL_FLAG, or 0-8)
-        """
-        return self.board_state[row][col]
-
-    def set_cell_value(self, row, col, value):
-        """Set the value of a cell.
-
-        Args:
-            row: Row index
-            col: Column index
-            value: New cell value
-        """
-        self.board_state[row][col] = value
-
     def is_cell_safe_highlight(self, row, col):
         """Check if a cell is highlighted as safe by solver.
 

@@ -66,18 +66,6 @@ class MinesweeperPresenter:
         if self.game_state.undo():
             self.view.update_display()
 
-    def on_variant_change(self):
-        """Handle variant change button click (cycles to next variant)."""
-        from core.constants import VARIANT_TYPES
-
-        idx = VARIANT_TYPES.index(self.game_state.variant) if self.game_state.variant in VARIANT_TYPES else 0
-        new_variant = VARIANT_TYPES[(idx + 1) % len(VARIANT_TYPES)]
-
-        if self.game_state.set_variant(new_variant):
-            self.game_state.reset(preserve_board=True)
-            self.view.show_status(f"Variant: {new_variant}")
-            self.view.update_display()
-
     def on_variant_set(self, variant):
         """Handle variant selection from dropdown.
 
@@ -120,14 +108,6 @@ class MinesweeperPresenter:
         self.view.on_grid_size_changed()
         self.view.update_display()
 
-    def get_game_state(self):
-        """Get the current game state.
-
-        Returns:
-            GameState instance
-        """
-        return self.game_state
-
     def get_rows(self):
         """Get number of rows.
 
@@ -167,22 +147,6 @@ class MinesweeperPresenter:
             2D list of cell values
         """
         return self.game_state.board_state
-
-    def get_safe_highlights(self):
-        """Get safe cell highlights.
-
-        Returns:
-            Set of (row, col) tuples for safe cells
-        """
-        return self.game_state.safe_highlights
-
-    def get_mine_highlights(self):
-        """Get mine cell highlights.
-
-        Returns:
-            Set of (row, col) tuples for mine cells
-        """
-        return self.game_state.mine_highlights
 
     def is_cell_safe_highlight(self, row, col):
         """Check if cell is highlighted as safe.

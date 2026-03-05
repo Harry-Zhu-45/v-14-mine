@@ -287,23 +287,6 @@ class BoardDetector:
 
         return consistency / max(count, 1)
 
-    def get_cell_positions(self) -> List[Tuple[int, int, int, int]]:
-        """Get the position of each cell in the grid.
-
-        Returns:
-            List of (x, y, width, height) for each cell
-        """
-        positions = []
-        ox, oy = self.grid_origin
-
-        for row in range(self.rows):
-            for col in range(self.cols):
-                x = ox + col * self.cell_width
-                y = oy + row * self.cell_height
-                positions.append((x, y, self.cell_width, self.cell_height))
-
-        return positions
-
     def get_cell_images(self) -> List[List[np.ndarray]]:
         """Extract individual cell images from the board.
 
@@ -324,17 +307,3 @@ class BoardDetector:
             cells.append(row_cells)
 
         return cells
-
-    def get_grid_info(self) -> dict:
-        """Get grid information.
-
-        Returns:
-            Dictionary with rows, cols, cell_width, cell_height, origin
-        """
-        return {
-            "rows": self.rows,
-            "cols": self.cols,
-            "cell_width": self.cell_width,
-            "cell_height": self.cell_height,
-            "origin": self.grid_origin,
-        }
