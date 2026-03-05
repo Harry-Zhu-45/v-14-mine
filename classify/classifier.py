@@ -26,7 +26,7 @@ class CellClassifier:
 
         Args:
             pattern_dir: Optional template directory path.
-            state_threshold: Confidence threshold for blank/flag/question templates.
+            state_threshold: Confidence threshold for flag/question templates.
             digit_threshold: Confidence threshold for digit templates.
             weak_threshold: Fallback threshold when OCR fails.
         """
@@ -106,11 +106,6 @@ class CellClassifier:
                 print(f"  [WEAK] label={fallback_label}, score={fallback_score:.3f}")
             return fallback_state
 
-        if blank_score >= self.weak_threshold and texture_std <= self.blank_std_threshold:
-            if debug:
-                print(f"  [WEAK] blank score={blank_score:.3f}, texture_std={texture_std:.2f}")
-            return CELL_UNKNOWN
-
         if debug:
             print("  [UNKNOWN] no confident match")
         return CELL_UNKNOWN
@@ -129,7 +124,7 @@ class CellClassifier:
 
     def _load_templates(self) -> None:
         """Load and preprocess templates from pattern directory."""
-        labels = [self.blank_label] + list(self.state_label_map.keys()) + [str(i) for i in range(10)]
+        labels = [self.blank_label] + list(self.state_label_map.keys()) + [str(i) for i in range(9)]
         for label in labels:
             template_path = self.pattern_dir / f"{label}.png"
             if not template_path.exists():
@@ -164,7 +159,7 @@ class CellClassifier:
         margin = max(1, int(min(h, w) * self.INNER_MARGIN_RATIO))
         if h - 2 * margin < 8 or w - 2 * margin < 8:
             return gray
-        return gray[margin:h - margin, margin:w - margin]
+        return gray[margin : h - margin, margin : w - margin]
 
     def _best_match(self, query: np.ndarray, labels: List[str]) -> Tuple[Optional[str], float]:
         """Return best template label and confidence score among candidate labels."""
@@ -277,15 +272,7 @@ class CellClassifier:
 
     def _extract_digit(self, text: str) -> int:
         """Extract first valid digit 0-8 from OCR output."""
-        normalized = (
-            text.replace("O", "0")
-            .replace("o", "0")
-            .replace("S", "5")
-            .replace("s", "5")
-            .replace("I", "1")
-            .replace("l", "1")
-            .replace("|", "1")
-        )
+        normalized = text.replace("O", "0").replace("o", "0").replace("S", "5").replace("s", "5").replace("I", "1").replace("l", "1").replace("|", "1")
         digits = [ch for ch in normalized if ch.isdigit()]
         if not digits:
             return -1
