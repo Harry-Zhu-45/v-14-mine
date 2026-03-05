@@ -13,10 +13,11 @@ A Minesweeper puzzle solver that uses the Z3 theorem prover to determine safe ce
 ## Features
 
 - **Exact Solver**: Uses Z3 constraint solving to find logically certain moves
-- **Multiple Variants**: Supports Standard, Knight, Manhattan, and OddEven neighbor rules
+- **Multiple Variants**: Supports Standard, Knight, and OddEven neighbor rules
 - **Interactive GUI**: PyQt-based interface for easy puzzle input
 - **Undo Support**: Ctrl+Z to undo moves
 - **Configurable Grid**: Adjustable grid size (5, 6, 7, 8) and mine count
+- **Image Recognition**: Capture and automatically recognize game boards from screenshots
 - **Visual Feedback**: Highlights safe cells (green) and mine cells (red)
 - **Question Mark Support**: Mark cells with "?" to indicate unknown numbers (not mines)
 
@@ -66,10 +67,9 @@ The solver supports multiple neighbor calculation variants:
 
 - **Standard**: 8 neighbors (adjacent and diagonal cells)
 - **Knight**: 8 knight moves (L-shaped only)
-- **Manhattan**: Standard 8 + 4 orthogonal cells at distance 2
 - **OddEven**: The absolute value of the difference between the number of mines on odd and even colored cells (checkerboard coloring) among the 8 neighbors
-
-To be continued (maybe)
+- **Cross**: 4 orthogonal neighbors (up, down, left, right)
+- **Partition**: Number of contiguous mine groups in the ring of 8 neighbors
 
 ## Installation
 
@@ -78,6 +78,10 @@ To be continued (maybe)
 - Python 3.9+
 - PyQt6
 - Z3 Solver
+- numpy
+- opencv-python
+- pillow
+- pytesseract
 
 ### Install Dependencies
 
